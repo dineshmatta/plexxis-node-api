@@ -1,9 +1,11 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const morgan = require('morgan')
-const cors = require('cors')
-const helmet = require('helmet') // creates headers that protect from attacks (security)
+import express from 'express';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
+import cors from 'cors';
+import helmet from 'helmet'; // creates headers that protect from attacks (security)
 const app = express();
+require('dotenv').config()
+const db = require('./db/queries')
 const port = 3001;
 
 const whitelist = ['http://localhost:3000'];
@@ -28,11 +30,14 @@ app.use(
   })
 )
 
+// App Routes
 app.get('/', (req, res) => {
   res.json({
     info: 'server running!'
   })
 })
+app.get('/users', db.getUsers);
+
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
