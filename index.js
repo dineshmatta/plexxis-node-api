@@ -37,11 +37,11 @@ app.get('/', (req, res) => {
   })
 })
 
-app.get('/users', db.getUsers)
-app.get('/users/:id', db.getUserById)
-app.post('/users', db.createUser)
-app.put('/users/:id', db.updateUser)
-app.delete('/users/:id', db.deleteUser)
+app.get('/api/employees', db.getUsers)
+app.get('/api/employees/:id', db.getUserById)
+app.post('/api/employees', db.createUser)
+app.put('/api/employees/:id', db.updateUser)
+app.delete('/api/employees/:id', db.deleteUser)
 
 
 app.listen(port, () => {
