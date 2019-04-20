@@ -1,61 +1,84 @@
 import pool from './config';
 
-const getUsers = (request, response) => {
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows);
-  })
+const getUsers = async (request, response) => {
+  const text = 'SELECT * FROM users ORDER BY id ASC';
+  try {
+    const res = await pool.query(text);
+    console.log('ssss', res.rows);
+    response.status(200).json(res.rows);
+  } catch(err) {
+    throw err.stack
+  }
 }
 
-const getUserById = (request, response) => {
+const getUserById = async (request, response) => {
   const id = parseInt(request.params.id)
+  const text = 'SELECT * FROM users WHERE id = $1';
+  const value = [id];
 
-  pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
+  try {
+    const res = await pool.query(text, value);
+    console.log('ppp', res.rows);
+    response.status(200).json(res.rows);
+  } catch(err) {
+    throw err.stack
+  }
 }
 
-const createUser = (request, response) => {
-  const { name, email } = request.body
+const createUser = async (request, response) => {
+  const { 
+    name,
+    code,
+    profession,
+    color,
+    city,
+    branch,
+    assigned 
+  } = request.body
 
-  pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(201).send(`User added with ID: ${result.insertId}`)
-  })
+  const text = 'INSERT INTO users (name, code, profession, color, city, branch, assigned) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+  const values = [name, code, profession, color, city, branch, assigned];
+  try {
+    const res = await pool.query(text, values);
+    response.status(201).send(res.rows[0]);
+  } catch(err) {
+    throw err.stack
+  }
 }
 
-const updateUser = (request, response) => {
+const updateUser = async(request, response) => {
   const id = parseInt(request.params.id)
-  const { name, email } = request.body
+  const { 
+    name,
+    code,
+    profession,
+    color,
+    city,
+    branch,
+    assigned 
+  } = request.body
 
-  pool.query(
-    'UPDATE users SET name = $1, email = $2 WHERE id = $3',
-    [name, email, id],
-    (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`User modified with ID: ${id}`)
-    }
-  )
+  const text = 'UPDATE users SET name = $1, code = $2, profession = $3, color = $4, city = $5, branch = $6, assigned = $7 WHERE id = $8 RETURNING *';
+  const values = [name, code, profession, color, city, branch, assigned, id];
+  try {
+    const res = await pool.query(text, values);
+    response.status(200).send(res.rows[0]);
+  } catch(err) {
+    throw err.stack
+  }
 }
 
-const deleteUser = (request, response) => {
+const deleteUser = async (request, response) => {
   const id = parseInt(request.params.id)
+  const text = 'DELETE FROM users WHERE id = $1 RETURNING *';
+  const value = [id]
 
-  pool.query('DELETE FROM users WHERE id = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).send(`User deleted with ID: ${id}`)
-  })
+  try {
+    const res = await pool.query(text, value);
+    response.status(200).send(res.rows[0]);
+  } catch(err) {
+    throw err.stack
+  }
 }
 
 module.exports = {
